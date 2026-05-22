@@ -633,8 +633,8 @@ function RecordsPage() {
 // ─── TABS CONFIG ──────────────────────────────────────────────────────────────
 const TABS = [
   { id: "booking", icon: "CalendarDays", label: "Броня" },
-  { id: "scan", icon: "QrCode", label: "QR" },
   { id: "history", icon: "Clock", label: "История" },
+  { id: "scan", icon: "QrCode", label: "QR" },
   { id: "profile", icon: "User", label: "Профиль" },
   { id: "more", icon: "Grid3X3", label: "Ещё" },
 ] as const;
