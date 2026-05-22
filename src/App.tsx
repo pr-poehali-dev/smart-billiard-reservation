@@ -792,7 +792,7 @@ export default function App() {
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "var(--emerald)" }}>
                 <Icon name="Table2" size={16} className="text-white" />
               </div>
-              <span className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>PoolPass</span>
+              <span className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>SMART BILLIARD</span>
             </div>
             <button className="relative w-8 h-8 flex items-center justify-center"
               onClick={() => setSubPage("notifications")}>
