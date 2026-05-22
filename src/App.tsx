@@ -129,42 +129,135 @@ function BookingPage() {
       <div className="flex-1 overflow-hidden relative px-4 pb-2">
         {view === "map" ? (
           <div className="relative h-full rounded-3xl overflow-hidden shadow-sm border border-gray-100"
-            style={{ background: "linear-gradient(160deg, #e8f5f0 0%, #d4ece4 40%, #c5e0d8 100%)" }}>
-            <svg className="absolute inset-0 w-full h-full opacity-15" viewBox="0 0 100 100" preserveAspectRatio="none">
-              {[15,25,35,45,55,65,75,85].map(v => (
-                <g key={v}>
-                  <line x1={v} y1="0" x2={v} y2="100" stroke="#006048" strokeWidth="0.4" />
-                  <line x1="0" y1={v} x2="100" y2={v} stroke="#006048" strokeWidth="0.4" />
-                </g>
+            style={{ background: "linear-gradient(160deg, #eef4f1 0%, #e2ece7 100%)" }}>
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+              {/* Park areas */}
+              <ellipse cx="20" cy="20" rx="14" ry="10" fill="#cfe8d8" opacity="0.85" />
+              <ellipse cx="85" cy="80" rx="16" ry="12" fill="#cfe8d8" opacity="0.85" />
+              <ellipse cx="78" cy="15" rx="9" ry="7" fill="#cfe8d8" opacity="0.7" />
+
+              {/* River */}
+              <path d="M-5,58 Q15,55 30,62 Q50,72 70,64 Q88,58 105,66 L105,75 Q88,67 70,73 Q50,81 30,71 Q15,64 -5,67 Z"
+                fill="#bcdfee" opacity="0.9" />
+
+              {/* City blocks - subtle rectangles */}
+              {[
+                [8, 38, 14, 8], [26, 35, 10, 10], [40, 30, 12, 9], [56, 35, 9, 8],
+                [70, 38, 11, 9], [12, 50, 10, 6], [42, 48, 11, 7], [60, 50, 10, 8],
+                [10, 78, 12, 9], [28, 80, 10, 8], [45, 82, 14, 8],
+              ].map(([x, y, w, h], i) => (
+                <rect key={i} x={x} y={y} width={w} height={h} rx="1"
+                  fill="#ffffff" opacity="0.55" />
               ))}
+
+              {/* Main avenues */}
+              <path d="M0,45 Q25,43 50,48 Q75,53 100,50" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
+              <path d="M0,45 Q25,43 50,48 Q75,53 100,50" fill="none" stroke="#d4dfd9" strokeWidth="0.6" strokeDasharray="0.5 0.8" />
+
+              <path d="M38,0 Q40,30 42,50 Q44,75 40,100" fill="none" stroke="#ffffff" strokeWidth="2.6" strokeLinecap="round" />
+              <path d="M38,0 Q40,30 42,50 Q44,75 40,100" fill="none" stroke="#d4dfd9" strokeWidth="0.5" strokeDasharray="0.5 0.8" />
+
+              <path d="M65,0 Q67,30 64,55 Q62,80 67,100" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+
+              {/* Smaller streets */}
+              <path d="M0,28 Q40,26 70,30 Q90,32 100,30" fill="none" stroke="#ffffff" strokeWidth="1.2" />
+              <path d="M0,72 Q35,70 60,74 Q85,77 100,74" fill="none" stroke="#ffffff" strokeWidth="1.4" />
+              <path d="M18,0 Q20,30 22,60 Q24,85 20,100" fill="none" stroke="#ffffff" strokeWidth="1" />
+              <path d="M82,0 Q84,30 85,55 Q86,80 88,100" fill="none" stroke="#ffffff" strokeWidth="1.1" />
+
+              {/* Park labels */}
+              <text x="20" y="21" textAnchor="middle" fontSize="2.4" fill="#5a8870" fontWeight="600" opacity="0.7">Парк</text>
+              <text x="85" y="81" textAnchor="middle" fontSize="2.4" fill="#5a8870" fontWeight="600" opacity="0.7">Сквер</text>
+
+              {/* Street labels */}
+              <text x="50" y="47" fontSize="1.8" fill="#9ab2a8" fontWeight="500" opacity="0.7">пр. Центральный</text>
+              <text x="43" y="20" fontSize="1.6" fill="#9ab2a8" fontWeight="500" opacity="0.6" transform="rotate(85 43 20)">ул. Парковая</text>
+
+              {/* River label */}
+              <text x="55" y="68" fontSize="1.8" fill="#6a9cb5" fontWeight="500" opacity="0.7" fontStyle="italic">р. Городская</text>
             </svg>
-            <svg className="absolute inset-0 w-full h-full opacity-40" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M0,45 Q30,42 50,50 Q70,58 100,52" fill="none" stroke="#006048" strokeWidth="2" />
-              <path d="M35,0 Q38,30 40,50 Q42,70 38,100" fill="none" stroke="#006048" strokeWidth="1.5" />
-              <path d="M60,0 Q65,35 62,60 Q60,80 65,100" fill="none" stroke="#006048" strokeWidth="1" />
-              <path d="M0,70 Q40,68 65,72 Q85,75 100,70" fill="none" stroke="#006048" strokeWidth="1.2" />
-            </svg>
+
+            {/* Decorative POI dots */}
+            <div className="absolute" style={{ left: "20%", top: "70%" }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 opacity-60" />
+            </div>
+            <div className="absolute" style={{ left: "75%", top: "45%" }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 opacity-60" />
+            </div>
+            <div className="absolute" style={{ left: "50%", top: "85%" }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 opacity-60" />
+            </div>
+
+            {/* Club pins */}
             {CLUBS.map((club) => (
               <button key={club.id} onClick={() => { setSelectedClub(club); setShowModal(true); }}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all active:scale-95"
+                className="absolute transform -translate-x-1/2 -translate-y-full transition-all active:scale-95 hover:scale-110 z-10 animate-slide-up"
                 style={{ left: `${club.x}%`, top: `${club.y}%` }}>
                 <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg text-white text-xs font-bold`}
-                    style={{ background: club.free > 0 ? "var(--emerald)" : "#9ca3af" }}>
-                    {club.free > 0 ? club.free : "—"}
+                  <div className="flex items-center gap-1.5 bg-white rounded-full pl-1 pr-2.5 py-1 shadow-lg border border-white">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold`}
+                      style={{ background: club.free > 0 ? "var(--emerald)" : "#9ca3af" }}>
+                      {club.free > 0 ? club.free : "—"}
+                    </div>
+                    <span className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "var(--text-primary)" }}>
+                      {club.price}₽
+                    </span>
                   </div>
-                  <div className="mt-1 bg-white rounded-lg px-2 py-0.5 shadow text-xs font-medium" style={{ color: "var(--text-primary)" }}>
-                    {club.name.split(" ")[0]}
-                  </div>
+                  {/* Pin tail */}
+                  <div className="w-0 h-0 -mt-px"
+                    style={{
+                      borderLeft: "5px solid transparent",
+                      borderRight: "5px solid transparent",
+                      borderTop: "7px solid #ffffff",
+                      filter: "drop-shadow(0 2px 2px rgba(0,0,0,0.1))"
+                    }} />
+                  <div className="w-2 h-2 rounded-full bg-white shadow-md -mt-0.5" />
                 </div>
               </button>
             ))}
-            <div className="absolute bottom-3 left-3 bg-white rounded-2xl px-3 py-2 shadow text-xs flex items-center gap-2">
-              <div className="w-3 h-3 rounded" style={{ background: "var(--emerald)" }} />
-              <span className="text-gray-500">Свободно</span>
-              <div className="w-3 h-3 rounded bg-gray-300 ml-1" />
-              <span className="text-gray-500">Занято</span>
+
+            {/* "You are here" marker */}
+            <div className="absolute transform -translate-x-1/2 -translate-y-1/2 z-0"
+              style={{ left: "50%", top: "50%" }}>
+              <div className="relative">
+                <div className="absolute inset-0 w-14 h-14 rounded-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
+                  style={{ background: "radial-gradient(circle, rgba(0,160,119,0.25) 0%, transparent 70%)", animation: "pulse 2.5s ease-in-out infinite" }} />
+                <div className="w-4 h-4 rounded-full border-[3px] border-white shadow-lg" style={{ background: "#00a077" }} />
+              </div>
             </div>
+
+            {/* Top scale bar */}
+            <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-full px-2.5 py-1 shadow text-[10px] font-medium text-gray-500 flex items-center gap-1">
+              <Icon name="Compass" size={11} style={{ color: "var(--emerald)" }} />
+              <span>Москва</span>
+            </div>
+
+            {/* Map controls */}
+            <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+              <button className="w-9 h-9 rounded-xl bg-white shadow flex items-center justify-center">
+                <Icon name="Plus" size={16} style={{ color: "var(--text-primary)" }} />
+              </button>
+              <button className="w-9 h-9 rounded-xl bg-white shadow flex items-center justify-center">
+                <Icon name="Minus" size={16} style={{ color: "var(--text-primary)" }} />
+              </button>
+              <button className="w-9 h-9 rounded-xl bg-white shadow flex items-center justify-center mt-1">
+                <Icon name="Locate" size={15} style={{ color: "var(--emerald)" }} />
+              </button>
+            </div>
+
+            {/* Legend */}
+            <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur rounded-2xl px-3 py-2 shadow-lg flex items-center gap-3 text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--emerald)" }} />
+                <span className="text-gray-600 font-medium">Свободно</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+                <span className="text-gray-600 font-medium">Занято</span>
+              </div>
+              <span className="ml-auto font-bold" style={{ color: "var(--emerald)" }}>{CLUBS.length} клубов</span>
+            </div>
+            <style>{`@keyframes pulse { 0%,100% { transform: scale(1); opacity: 1 } 50% { transform: scale(1.5); opacity: 0.5 } }`}</style>
           </div>
         ) : (
           <div className="overflow-y-auto h-full space-y-3">
@@ -632,7 +725,7 @@ function RecordsPage() {
 
 // ─── TABS CONFIG ──────────────────────────────────────────────────────────────
 const TABS = [
-  { id: "booking", icon: "CalendarDays", label: "Броня" },
+  { id: "booking", icon: "MapPin", label: "Клубы" },
   { id: "history", icon: "Clock", label: "История" },
   { id: "scan", icon: "QrCode", label: "QR" },
   { id: "profile", icon: "User", label: "Профиль" },
