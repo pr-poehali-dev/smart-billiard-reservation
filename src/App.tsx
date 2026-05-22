@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Icon from "@/components/ui/icon";
 
 declare global {
-  interface Window { L: any }
+  interface Window { ymaps: any }
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -80,8 +80,8 @@ function Chip({ text, variant = "default" }: { text: string; variant?: "default"
   return <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${s[variant]}`}>{text}</span>;
 }
 
-// ─── Leaflet Map ──────────────────────────────────────────────────────────────
-function LeafletMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void }) {
+// ─── Yandex Map ───────────────────────────────────────────────────────────────
+function YandexMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
 
@@ -89,80 +89,80 @@ function LeafletMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void }) {
     if (!mapRef.current) return;
     let cancelled = false;
 
-    const init = () => {
-      if (cancelled || !window.L || !mapRef.current || mapInstance.current) return;
-      const L = window.L;
-      const map = L.map(mapRef.current, {
+    const buildMap = () => {
+      if (cancelled || !mapRef.current || mapInstance.current) return;
+      const ymaps = window.ymaps;
+
+      const map = new ymaps.Map(mapRef.current, {
         center: [55.755, 37.6],
         zoom: 12,
-        zoomControl: false,
-        attributionControl: false,
+        controls: [],
+      }, {
+        suppressMapOpenBlock: true,
+        yandexMapDisablePoiInteractivity: true,
       });
       mapInstance.current = map;
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        maxZoom: 19,
-        subdomains: "abcd",
-      }).addTo(map);
-
       CLUBS.forEach((club) => {
-        const html = `
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:3px 10px 3px 3px;box-shadow:0 4px 12px rgba(0,0,0,0.15);border:2px solid #fff;white-space:nowrap;">
+        const layout = `
+          <div style="position:relative;transform:translate(-50%,-100%);">
+            <div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:3px 10px 3px 3px;box-shadow:0 4px 12px rgba(0,0,0,0.18);border:2px solid #fff;white-space:nowrap;cursor:pointer;font-family:'Golos Text',sans-serif;">
               <div style="width:22px;height:22px;border-radius:50%;background:${club.free > 0 ? "#006048" : "#9ca3af"};color:#fff;font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;">${club.free > 0 ? club.free : "—"}</div>
               <span style="font-size:11px;font-weight:600;color:#0d1a16;">${club.price}₽</span>
             </div>
-            <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #fff;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.1));"></div>
+            <div style="position:absolute;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #fff;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.1));"></div>
           </div>
         `;
-        const icon = L.divIcon({
-          className: "club-pin-icon",
-          html,
-          iconSize: [80, 36],
-          iconAnchor: [40, 36],
+        const PinLayout = ymaps.templateLayoutFactory.createClass(layout);
+
+        const placemark = new ymaps.Placemark([club.lat, club.lng], {
+          hintContent: club.name,
+        }, {
+          iconLayout: PinLayout,
+          iconShape: { type: "Rectangle", coordinates: [[-40, -40], [40, 0]] },
         });
-        const marker = L.marker([club.lat, club.lng], { icon }).addTo(map);
-        marker.on("click", () => onSelect(club));
+
+        placemark.events.add("click", () => onSelect(club));
+        map.geoObjects.add(placemark);
       });
 
       // "You are here"
-      const meIcon = L.divIcon({
-        className: "me-pin-icon",
-        html: `
-          <div style="position:relative;width:18px;height:18px;">
-            <div style="position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(0,160,119,0.35) 0%,transparent 70%);animation:pulse 2.5s ease-in-out infinite;"></div>
-            <div style="width:18px;height:18px;border-radius:50%;background:#00a077;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,96,72,0.4);"></div>
-          </div>
-        `,
-        iconSize: [18, 18],
-        iconAnchor: [9, 9],
+      const meLayout = ymaps.templateLayoutFactory.createClass(`
+        <div style="position:relative;width:18px;height:18px;transform:translate(-50%,-50%);">
+          <div style="position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(0,160,119,0.35) 0%,transparent 70%);animation:ymPulse 2.5s ease-in-out infinite;"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:#00a077;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,96,72,0.4);"></div>
+        </div>
+      `);
+      const mePlacemark = new ymaps.Placemark([55.755, 37.6], {}, {
+        iconLayout: meLayout,
+        iconShape: { type: "Circle", coordinates: [0, 0], radius: 9 },
       });
-      L.marker([55.755, 37.6], { icon: meIcon }).addTo(map);
+      map.geoObjects.add(mePlacemark);
     };
 
-    if (window.L) {
-      init();
-    } else {
-      const interval = setInterval(() => {
-        if (window.L) {
-          clearInterval(interval);
-          init();
-        }
-      }, 100);
-      setTimeout(() => clearInterval(interval), 5000);
-    }
+    const tryInit = () => {
+      if (window.ymaps && window.ymaps.ready) {
+        window.ymaps.ready(buildMap);
+      } else {
+        setTimeout(tryInit, 150);
+      }
+    };
+    tryInit();
 
     return () => {
       cancelled = true;
       if (mapInstance.current) {
-        mapInstance.current.remove();
+        try { mapInstance.current.destroy(); } catch { /* noop */ }
         mapInstance.current = null;
       }
     };
   }, [onSelect]);
 
-  const zoom = (delta: number) => mapInstance.current?.setZoom(mapInstance.current.getZoom() + delta);
-  const locate = () => mapInstance.current?.setView([55.755, 37.6], 13);
+  const zoom = (delta: number) => {
+    const m = mapInstance.current;
+    if (m) m.setZoom(m.getZoom() + delta, { duration: 200 });
+  };
+  const locate = () => mapInstance.current?.setCenter([55.755, 37.6], 13, { duration: 300 });
 
   return (
     <div className="relative h-full rounded-3xl overflow-hidden shadow-sm border border-gray-100">
@@ -197,9 +197,9 @@ function LeafletMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void }) {
         <span className="ml-auto font-bold" style={{ color: "var(--emerald)" }}>{CLUBS.length} клубов</span>
       </div>
       <style>{`
-        @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1 } 50% { transform: scale(1.4); opacity: 0.4 } }
-        .leaflet-container { font-family: 'Golos Text', sans-serif !important; background: #eef4f1 !important; }
-        .club-pin-icon, .me-pin-icon { background: transparent !important; border: none !important; }
+        @keyframes ymPulse { 0%,100% { transform: scale(1); opacity: 1 } 50% { transform: scale(1.4); opacity: 0.4 } }
+        .ymaps-2-1-79-map, ymaps { font-family: 'Golos Text', sans-serif !important; }
+        .ymaps-2-1-79-copyrights-pane { display: none !important; }
       `}</style>
     </div>
   );
@@ -259,7 +259,7 @@ function BookingPage() {
 
       <div className="flex-1 overflow-hidden relative px-4 pb-2">
         {view === "map" ? (
-          <LeafletMap onSelect={(c) => { setSelectedClub(c); setShowModal(true); }} />
+          <YandexMap onSelect={(c) => { setSelectedClub(c); setShowModal(true); }} />
         ) : (
           <div className="overflow-y-auto h-full space-y-3">
             {CLUBS.map((club, i) => (
