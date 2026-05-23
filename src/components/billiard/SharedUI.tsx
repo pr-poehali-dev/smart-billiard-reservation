@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import Icon from "@/components/ui/icon";
 import { CLUBS } from "@/data/mockData";
+import { useCity } from "@/hooks/useCity";
 
 declare global {
   interface Window { ymaps: any }
@@ -35,17 +36,23 @@ export function SectionHeader({ title, action, onAction }: { title: string; acti
 export function YandexMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
+  const { city, detectCity } = useCity();
 
   useEffect(() => {
     if (!mapRef.current) return;
     let cancelled = false;
 
     const buildMap = () => {
-      if (cancelled || !mapRef.current || mapInstance.current) return;
+      if (cancelled || !mapRef.current) return;
       const ymaps = window.ymaps;
 
+      if (mapInstance.current) {
+        try { mapInstance.current.destroy(); } catch { /* noop */ }
+        mapInstance.current = null;
+      }
+
       const map = new ymaps.Map(mapRef.current, {
-        center: [55.755, 37.6],
+        center: [city.lat, city.lng],
         zoom: 12,
         controls: [],
       }, {
@@ -77,14 +84,14 @@ export function YandexMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void
         map.geoObjects.add(placemark);
       });
 
-      // "You are here"
+      // "You are here" — центр выбранного города
       const meLayout = ymaps.templateLayoutFactory.createClass(`
         <div style="position:relative;width:18px;height:18px;transform:translate(-50%,-50%);">
           <div style="position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(0,160,119,0.35) 0%,transparent 70%);animation:ymPulse 2.5s ease-in-out infinite;"></div>
           <div style="width:18px;height:18px;border-radius:50%;background:#00a077;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,96,72,0.4);"></div>
         </div>
       `);
-      const mePlacemark = new ymaps.Placemark([55.755, 37.6], {}, {
+      const mePlacemark = new ymaps.Placemark([city.lat, city.lng], {}, {
         iconLayout: meLayout,
         iconShape: { type: "Circle", coordinates: [0, 0], radius: 9 },
       });
@@ -107,13 +114,16 @@ export function YandexMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void
         mapInstance.current = null;
       }
     };
-  }, [onSelect]);
+  }, [onSelect, city]);
 
   const zoom = (delta: number) => {
     const m = mapInstance.current;
     if (m) m.setZoom(m.getZoom() + delta, { duration: 200 });
   };
-  const locate = () => mapInstance.current?.setCenter([55.755, 37.6], 13, { duration: 300 });
+  const locate = () => {
+    detectCity();
+    mapInstance.current?.setCenter([city.lat, city.lng], 13, { duration: 300 });
+  };
 
   return (
     <div className="relative h-full rounded-3xl overflow-hidden shadow-sm border border-gray-100">
@@ -121,7 +131,7 @@ export function YandexMap({ onSelect }: { onSelect: (c: typeof CLUBS[0]) => void
 
       <div className="absolute top-3 right-3 bg-white/95 backdrop-blur rounded-full px-2.5 py-1 shadow text-[10px] font-medium text-gray-500 flex items-center gap-1 z-[400]">
         <Icon name="Compass" size={11} style={{ color: "var(--emerald)" }} />
-        <span>Москва</span>
+        <span>{city.name}</span>
       </div>
 
       <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-[400]">

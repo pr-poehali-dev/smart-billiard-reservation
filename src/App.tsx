@@ -4,6 +4,7 @@ import Icon from "@/components/ui/icon";
 import { Tab, SubPage, TABS } from "@/data/mockData";
 import { BookingPage, ScanPage, HistoryPage, ProfilePage, MorePage } from "@/components/billiard/MainPages";
 import { RatingPage, NotificationsPage, PaymentsPage, PromoPage, RecordsPage } from "@/components/billiard/SubPages";
+import { CitySelector } from "@/components/billiard/CitySelector";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("booking");
@@ -36,28 +37,28 @@ export default function App() {
     <div className="min-h-screen font-golos" style={{ background: "var(--surface-2)" }}>
       {/* ─── MOBILE (< md) ─────────────────────────────────────────────────── */}
       <div className="md:hidden flex flex-col h-screen max-w-md mx-auto relative overflow-hidden">
-        <header className="flex items-center px-4 py-3 bg-white border-b border-gray-100 z-10 flex-shrink-0">
+        <header className="px-4 py-3 bg-white border-b border-gray-100 z-30 flex-shrink-0">
           {subPage ? (
-            <>
+            <div className="flex items-center">
               <button onClick={() => setSubPage(null)} className="w-8 h-8 flex items-center justify-center mr-2 -ml-1">
                 <Icon name="ArrowLeft" size={20} style={{ color: "var(--text-primary)" }} />
               </button>
               <h1 className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>{subTitles[subPage]}</h1>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="flex items-center gap-2 flex-1">
+            <div className="flex items-center">
+              <div className="flex items-center gap-2 mr-3">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "var(--emerald)" }}>
                   <Icon name="Table2" size={16} className="text-white" />
                 </div>
-                <span className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>SMART BILLIARD</span>
               </div>
-              <button className="relative w-8 h-8 flex items-center justify-center"
+              <CitySelector />
+              <button className="relative w-8 h-8 flex items-center justify-center ml-auto"
                 onClick={() => setSubPage("notifications")}>
                 <Icon name="Bell" size={20} style={{ color: "var(--text-primary)" }} />
                 <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ background: "var(--emerald)" }} />
               </button>
-            </>
+            </div>
           )}
         </header>
 
@@ -154,9 +155,13 @@ export default function App() {
                 <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>{subTitles[subPage]}</h1>
               </>
             ) : (
-              <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>
-                {TABS.find(t => t.id === tab)?.label}
-              </h1>
+              <div className="flex items-center gap-4">
+                <h1 className="font-bold text-xl" style={{ color: "var(--text-primary)" }}>
+                  {TABS.find(t => t.id === tab)?.label}
+                </h1>
+                <div className="h-6 w-px bg-gray-200" />
+                <CitySelector />
+              </div>
             )}
             <div className="ml-auto flex items-center gap-3">
               <div className="hidden lg:flex items-center gap-2 bg-gray-50 rounded-2xl px-3 py-2 w-72">

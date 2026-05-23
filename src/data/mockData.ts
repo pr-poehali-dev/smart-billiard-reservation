@@ -60,3 +60,48 @@ export const TABS = [
   { id: "profile", icon: "User", label: "Профиль" },
   { id: "more", icon: "Grid3X3", label: "Ещё" },
 ] as const;
+
+export type City = {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  clubs: number;
+};
+
+export const CITIES: City[] = [
+  { id: "msk", name: "Москва", lat: 55.755, lng: 37.6, clubs: 6 },
+  { id: "spb", name: "Санкт-Петербург", lat: 59.9343, lng: 30.3351, clubs: 4 },
+  { id: "ekb", name: "Екатеринбург", lat: 56.8389, lng: 60.6057, clubs: 3 },
+  { id: "nsk", name: "Новосибирск", lat: 55.0084, lng: 82.9357, clubs: 2 },
+  { id: "kzn", name: "Казань", lat: 55.7963, lng: 49.1064, clubs: 2 },
+  { id: "nn", name: "Нижний Новгород", lat: 56.2965, lng: 43.9361, clubs: 2 },
+  { id: "krd", name: "Краснодар", lat: 45.0355, lng: 38.9753, clubs: 2 },
+  { id: "smr", name: "Самара", lat: 53.1959, lng: 50.1002, clubs: 1 },
+  { id: "ufa", name: "Уфа", lat: 54.7388, lng: 55.9721, clubs: 1 },
+  { id: "rnd", name: "Ростов-на-Дону", lat: 47.2225, lng: 39.7187, clubs: 1 },
+  { id: "vld", name: "Владивосток", lat: 43.1198, lng: 131.8869, clubs: 1 },
+  { id: "sch", name: "Сочи", lat: 43.6028, lng: 39.7342, clubs: 1 },
+];
+
+// Расстояние между координатами по формуле гаверсинусов (км)
+export function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+export function nearestCity(lat: number, lng: number): City {
+  let best = CITIES[0];
+  let bestD = Infinity;
+  for (const c of CITIES) {
+    const d = distanceKm(lat, lng, c.lat, c.lng);
+    if (d < bestD) { bestD = d; best = c; }
+  }
+  return best;
+}
